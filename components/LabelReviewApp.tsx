@@ -703,13 +703,15 @@ export function LabelReviewApp() {
         </div>
       </section>
 
-      <div className="mode-switch" role="tablist" aria-label="Review mode">
-        <button type="button" className={mode === "single" ? "active" : ""} onClick={() => setMode("single")}>
-          Single
-        </button>
-        <button type="button" className={mode === "batch" ? "active" : ""} onClick={() => setMode("batch")}>
-          Batch
-        </button>
+      <div className="mode-switch-row">
+        <div className="mode-switch" role="tablist" aria-label="Review mode">
+          <button type="button" className={mode === "single" ? "active" : ""} onClick={() => setMode("single")}>
+            Single
+          </button>
+          <button type="button" className={mode === "batch" ? "active" : ""} onClick={() => setMode("batch")}>
+            Batch
+          </button>
+        </div>
       </div>
 
       {mode === "single" ? (

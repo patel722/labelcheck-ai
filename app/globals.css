@@ -125,9 +125,13 @@ h1 {
   align-items: start;
 }
 
-.mode-switch {
+.mode-switch-row {
   max-width: 1360px;
   margin: 0 auto 16px;
+  min-width: 0;
+}
+
+.mode-switch {
   display: inline-flex;
   padding: 4px;
   border: 1px solid var(--border);
