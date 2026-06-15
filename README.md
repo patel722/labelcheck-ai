@@ -236,10 +236,17 @@ If AI extraction fails, times out, or is not configured for a custom upload, the
 
 - Durable server-side review queue for larger batch workloads
 - Image preprocessing for cropping, glare reduction, and perspective correction with reviewer audit controls
+- Multi-panel label review for front, back, neck, and side panels
 - Human review queue and reviewer notes
 - Audit logging and retention policy controls
 - Provider adapters for Cloudflare Workers AI and Ollama Cloud
 - FedRAMP-authorized deployment profile and model monitoring
+
+## Future Enhancement: Multi-Panel Label Review
+
+Production alcohol label review may need to evaluate multiple panels from the same product, including front, back, neck, or side labels. This prototype focuses on one primary label image to keep the assessment workflow fast, clear, and easy to evaluate.
+
+The current extraction and validation boundary could be extended to accept multiple uploaded panel images, merge extracted fields into one structured label record, and run the same deterministic validators to produce a consolidated review report.
 
 ## Requirement Traceability
 

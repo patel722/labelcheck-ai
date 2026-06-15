@@ -305,6 +305,11 @@ summary:focus-visible {
   font-size: 0.92rem;
 }
 
+.upload-box > div:first-child .fine-print {
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
 .file-drop {
   display: flex;
   min-height: 74px;

@@ -730,6 +730,9 @@ export function LabelReviewApp() {
               <div>
                 <h3 id="upload-heading">Label Image</h3>
                 <p>Upload one label image, or choose a fictional sample label.</p>
+                <p className="fine-print">
+                  Prototype note: upload the primary label image. A production workflow could extend this to front/back or multi-panel label sets.
+                </p>
               </div>
               <label className="file-drop">
                 <Upload aria-hidden="true" />
