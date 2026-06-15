@@ -51,6 +51,36 @@ Image Upload
 - Cloudflare Workers via OpenNext
 - OpenAI Responses API for optional vision extraction
 
+## Evaluator Quick Start
+
+Live URL: `https://labelcheck.someshpatel.com`
+
+Recommended deterministic demo path:
+
+1. Open the live URL.
+2. In Single mode, choose a sample label from the `Try a sample` dropdown. The expected application fields populate automatically and the sample image preview appears.
+3. Click `Review Label`. Demo mode uses local fixture extraction, so this path does not require provider tokens.
+4. Try `Old Tom Distillery Bourbon` for a clean pass, `Riverbend Cellars Red Wine` for an alcohol-content failure, and `Mesa Verde Mezcal` for a glare-driven human-review case.
+5. Expand the details panel only if you want to inspect normalized values, raw extraction JSON, processing time, mode, and provider metadata.
+6. Use `Export JSON report` or `Export CSV summary` to inspect the review output.
+
+AI extraction path:
+
+1. Download sample label PNGs from [`public/samples`](https://github.com/patel722/labelcheck-ai/tree/main/public/samples).
+2. In Single mode, choose a sample from the dropdown first to populate the expected fields.
+3. Click the upload control and select the matching PNG you downloaded. Uploading a file clears demo selection and sends the image through the hosted AI extraction path.
+4. Click `Review Label` and check that the result shows `AI mode`, processing time, extracted values, field-level evidence, and deterministic validation reasons.
+5. If the provider is temporarily unavailable or rate limited, the app routes the upload to `Needs Review` instead of making an unsupported automated comparison.
+
+Batch demo path:
+
+1. Switch to Batch mode.
+2. Click `Add sample batch`.
+3. Run `Review Ready Queue`.
+4. Export all results as CSV or JSON.
+
+Response-time note: the assessment emphasized that reviewers need results in about five seconds. LabelCheck AI is designed around that constraint by keeping deterministic validation local, making one structured vision request for custom uploads, displaying processing time in the result, and avoiding long multi-step AI chains. Actual AI latency can vary with provider availability, image size/quality, network conditions, and the configured model.
+
 ## Setup
 
 ```bash
@@ -101,35 +131,6 @@ npm run cf:check
 npm audit --omit=dev
 npm audit
 ```
-
-## Evaluator Quick Start
-
-Live URL: `https://labelcheck.someshpatel.com`
-
-Recommended deterministic demo path:
-
-1. Open the live URL.
-2. In Single mode, choose a sample label from the `Try a sample` dropdown. The expected application fields populate automatically and the sample image preview appears.
-3. Click `Review Label`. Demo mode uses local fixture extraction, so this path does not require an API key or spend provider tokens.
-4. Try `Old Tom Distillery Bourbon` for a clean pass, `Riverbend Cellars Red Wine` for an alcohol-content failure, and `Mesa Verde Mezcal` for a glare-driven human-review case.
-5. Expand the details panel only if you want to inspect normalized values, raw extraction JSON, processing time, mode, and provider metadata.
-6. Use `Export JSON report` or `Export CSV summary` to inspect the review output.
-
-Batch demo path:
-
-1. Switch to Batch mode.
-2. Click `Add sample batch`.
-3. Run `Review Ready Queue`.
-4. Export all results as CSV or JSON.
-
-Optional AI extraction path:
-
-1. In Single mode, choose a sample from the dropdown first to populate the expected fields.
-2. Click the upload control and select the matching PNG from `public/samples` in this repository. Uploading a file clears demo selection and sends the image through AI mode when `OPENAI_API_KEY` is configured.
-3. Click `Review Label` and check that the result shows `AI mode`, processing time, extracted values, field-level evidence, and deterministic validation reasons.
-4. If provider credentials, quota, or availability are not configured, the app routes the upload to `Needs Review` instead of making an unsupported automated comparison.
-
-Response-time note: the assessment emphasized that reviewers need results in about five seconds. LabelCheck AI keeps deterministic validation local, sends one structured vision request for custom uploads, displays processing time in the result, and avoids long multi-step AI chains. Actual AI latency depends on provider availability, image size/quality, network conditions, and the configured model, so this prototype treats the five-second mark as an operational target rather than a guaranteed service-level objective.
 
 ## Realistic Sample Labels
 
