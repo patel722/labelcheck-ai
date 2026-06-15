@@ -89,6 +89,8 @@ Open `http://localhost:3000`.
 
 ## Tests And Checks
 
+For full validator, API, fixture, browser, and deployment-readiness coverage, see `TEST_PLAN.md`.
+
 ```bash
 npm test
 npm run typecheck
@@ -107,13 +109,27 @@ Live URL: `https://labelcheck.someshpatel.com`
 Recommended deterministic demo path:
 
 1. Open the live URL.
-2. Use Single mode and choose `Old Tom Distillery Bourbon`; expected result is `Pass`.
-3. Choose `Riverbend Cellars Red Wine`; expected result is `Fail`.
-4. Choose `Mesa Verde Mezcal`; expected result is `Needs Review`.
-5. Switch to Batch mode and click `Add sample batch`.
-6. Run `Review Ready Queue`, then export all results as CSV or JSON.
+2. In Single mode, choose a sample label from the `Try a sample` dropdown. The expected application fields populate automatically and the sample image preview appears.
+3. Click `Review Label`. Demo mode uses local fixture extraction, so this path does not require an API key or spend provider tokens.
+4. Try `Old Tom Distillery Bourbon` for a clean pass, `Riverbend Cellars Red Wine` for an alcohol-content failure, and `Mesa Verde Mezcal` for a glare-driven human-review case.
+5. Expand the details panel only if you want to inspect normalized values, raw extraction JSON, processing time, mode, and provider metadata.
+6. Use `Export JSON report` or `Export CSV summary` to inspect the review output.
 
-These sample paths use local fixtures and do not spend provider tokens.
+Batch demo path:
+
+1. Switch to Batch mode.
+2. Click `Add sample batch`.
+3. Run `Review Ready Queue`.
+4. Export all results as CSV or JSON.
+
+Optional AI extraction path:
+
+1. In Single mode, choose a sample from the dropdown first to populate the expected fields.
+2. Click the upload control and select the matching PNG from `public/samples` in this repository. Uploading a file clears demo selection and sends the image through AI mode when `OPENAI_API_KEY` is configured.
+3. Click `Review Label` and check that the result shows `AI mode`, processing time, extracted values, field-level evidence, and deterministic validation reasons.
+4. If provider credentials, quota, or availability are not configured, the app routes the upload to `Needs Review` instead of making an unsupported automated comparison.
+
+Response-time note: the assessment emphasized that reviewers need results in about five seconds. LabelCheck AI keeps deterministic validation local, sends one structured vision request for custom uploads, displays processing time in the result, and avoids long multi-step AI chains. Actual AI latency depends on provider availability, image size/quality, network conditions, and the configured model, so this prototype treats the five-second mark as an operational target rather than a guaranteed service-level objective.
 
 ## Realistic Sample Labels
 
@@ -261,25 +277,6 @@ The current extraction and validation boundary could be extended to accept multi
 | Peak season batch uploads | Five-label client-side batch queue with CSV/JSON exports |
 | Evaluators need inspectable stretch features | Five-label batch queue, CSV expected-field import, and all-results exports |
 | Poor label photos should not become automatic failures | Image quality flags route ambiguous glare, blur, crop, and occlusion cases to review |
-
-## Test Plan
-
-| Scenario | Expected Result |
-|---|---|
-| Old Tom Distillery Bourbon | Pass |
-| Stone’s Throw Rye | Pass with formatting/proof/unit normalization |
-| Riverbend Cellars Red Wine | Fail for alcohol content mismatch |
-| Harbor Light Brewing IPA | Fail for title-case warning heading |
-| Copper Ridge Vodka | Fail for missing government warning |
-| Mesa Verde Mezcal | Needs Review for glare/low-confidence warning |
-| North Fork Cidery | Needs Review for close but non-exact class/type |
-| Silver Pine Gin | Pass with proof and net contents equivalence |
-| AI API unavailable | Graceful demo/fallback behavior |
-| Custom upload with no API key | Needs Review, not Fail |
-| SVG custom upload | Rejected with clear error |
-| Spoofed image MIME | Rejected with clear error |
-| Batch CSV duplicate filename | Rejected before review |
-| Batch sample queue | Produces mixed pass/fail/review results without provider calls |
 
 ## AI Assistance Used
 
