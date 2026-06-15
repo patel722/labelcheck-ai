@@ -189,9 +189,11 @@ The provider choice is intentionally isolated behind `lib/aiExtractor.ts`. Deter
 
 AI is used only to extract visible label information into a structured schema. The model is instructed not to invent missing fields. The server route then runs deterministic validators for brand matching, class/type matching, ABV/proof equivalence, net contents equivalence, and government warning text/format checks.
 
-The OpenAI extraction prompt is maintained in `lib/aiExtractionGuidelines.ts` and summarized in `AI_EXTRACTION_GUIDELINES.md`. It tells the model to copy visible text, return `null` for unreadable fields, avoid unit conversions, report field confidence, include short extraction evidence for each reviewed field, flag image quality issues, and avoid pass/fail/legal conclusions.
+The OpenAI extraction prompt is maintained in `lib/aiExtractionGuidelines.ts` and summarized in `AI_EXTRACTION_GUIDELINES.md`. It tells the model to copy visible text, return `null` for unreadable fields, avoid unit conversions, report field confidence, include short extraction evidence for each reviewed field, flag image quality issues, lower confidence when glare or obstructions affect a field, and avoid pass/fail/legal conclusions.
 
 Extraction evidence is a reviewer-facing traceability layer. Each reviewed field can include the extracted value, a confidence score for that value, a short quote or visual cue, and the evidence source. The app displays this beside the deterministic check and includes it in JSON exports, but evidence does not make the compliance recommendation. Validators still decide whether a field passes, fails, or needs human review.
+
+If glare, reflection, crop, angle, occlusion, folds, tears, overprinting, label curvature, or another obstacle materially affects the government warning block, the app treats that as a human-review signal. The model may still extract the warning text, but visual uncertainty should lower warning confidence and prevent the app from overstating certainty.
 
 Sample labels use deterministic fixtures to avoid spending API tokens and to make evaluator testing reproducible. The fixture extraction data lives with the sample metadata in `lib/samples.ts`.
 

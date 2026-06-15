@@ -14,7 +14,7 @@ npm run build
 - Brand normalization: smart quotes, straight apostrophes, punctuation, case, whitespace, and clearly different brands.
 - Alcohol content: ABV/proof equivalence, `Alc./Vol.` parsing, tolerance boundaries, and clear mismatches.
 - Net contents: `mL`, `ML`, liters, and fluid ounces.
-- Government warning: exact text, all-caps heading with colon, title-case heading failure, missing warning failure, bold uncertainty, and legibility/low-confidence review routing.
+- Government warning: exact text, all-caps heading with colon, title-case heading failure, missing warning failure, bold uncertainty, legibility/low-confidence review routing, and image-quality-driven review routing when the warning block is materially obstructed.
 - Class/type: exact match, close but not exact review routing, and clearly different values.
 - Overall aggregation: any fail wins; otherwise any needs-review wins; otherwise pass.
 

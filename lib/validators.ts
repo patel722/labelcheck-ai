@@ -395,6 +395,10 @@ export function validateGovernmentWarning(extracted: ExtractedLabel): CheckResul
     reviewItems.push("Government warning extraction confidence is low.");
   }
 
+  if (qualityReason) {
+    reviewItems.push(qualityReason);
+  }
+
   const status: ReviewStatus = failures.length ? "fail" : reviewItems.length ? "needs_review" : "pass";
   const reason =
     status === "pass"

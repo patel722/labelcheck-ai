@@ -6,6 +6,7 @@
 - AI is used for extraction only. Deterministic validators produce `pass`, `needs_review`, or `fail`.
 - Extraction evidence is used to explain what the model saw, not to override deterministic validation.
 - Ambiguous, low-confidence, or image-quality-limited extraction should route to human review rather than an automated final decision.
+- Material glare, reflection, crop, occlusion, or other visual obstruction over a required field should lower extraction confidence even when the model can read some text.
 - The realistic sample images are fictional and synthetically generated. They are not real products, approved labels, or regulatory guidance.
 - The sample UI intentionally displays natural product names instead of expected outcomes or test-case names.
 

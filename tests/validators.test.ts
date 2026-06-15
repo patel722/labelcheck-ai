@@ -200,6 +200,24 @@ describe("deterministic validators", () => {
     ).toBe("needs_review");
   });
 
+  it("routes warning extraction to review when image quality materially affects the warning block", () => {
+    const result = validateGovernmentWarning(
+      warningExtraction({
+        imageQuality: [
+          {
+            type: "glare",
+            severity: "moderate",
+            affectedFields: ["government_warning"],
+            note: "Glare crosses the government warning block.",
+          },
+        ],
+      }),
+    );
+
+    expect(result.status).toBe("needs_review");
+    expect(result.reason).toContain("Image quality may affect this field");
+  });
+
   it("passes exact government warning text", () => {
     const result = validateGovernmentWarning(warningExtraction());
     expect(result.status).toBe("pass");
