@@ -75,7 +75,7 @@ OPENAI_BASE_URL=https://api.openai.com/v1
 
 The app also reads `.env`, which is useful for local testing. Secret files are ignored by git.
 
-Only PNG, JPEG, and WebP are accepted for live custom uploads. Bundled sample labels are realistic PNG raster images. Custom uploads are sniffed server-side to verify that declared MIME type and image bytes match.
+Only PNG, JPEG, and WebP are accepted for live custom uploads. Bundled sample labels are realistic PNG raster images served from `public/samples`. Custom uploads are sniffed server-side to verify that declared MIME type and image bytes match.
 
 `OPENAI_BASE_URL` defaults to `https://api.openai.com/v1`. Keep it unset for normal OpenAI API use. Set it only when using an approved compatible endpoint, such as an authorized future government endpoint.
 

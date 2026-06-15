@@ -39,7 +39,7 @@ export async function POST(request: Request) {
     let image: Buffer | undefined;
     let mimeType: string | undefined;
 
-    if (file instanceof File && file.size > 0) {
+    if (file instanceof File) {
       const validatedImage = await validateImageFile(file);
       image = validatedImage.image;
       mimeType = validatedImage.mimeType;

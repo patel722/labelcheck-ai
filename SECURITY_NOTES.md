@@ -45,6 +45,7 @@ Bundled sample images are fictional and synthetically generated for product demo
 - Human review workflow
 - Model monitoring
 - Prompt/version control
+- Rate limiting, request quotas, and abuse/cost controls for public AI-backed upload endpoints
 - Request and response redaction in logs
 - Malware scanning for uploaded files
 - Production image preprocessing and size controls beyond prototype resize/compression

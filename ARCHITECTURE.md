@@ -37,7 +37,7 @@ The UI labels the output as a review recommendation. It does not call the result
 
 ## Data Handling
 
-- Sample images are static fictional assets under `public/realistic-samples`.
+- Sample images are static fictional assets under `public/samples`.
 - Sample/demo mode does not use external AI services.
 - Uploaded images are held in memory for the request and are not persisted.
 - Secrets are read only on the server or Cloudflare Worker runtime.

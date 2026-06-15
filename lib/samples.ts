@@ -49,7 +49,7 @@ export const sampleCases: SampleCase[] = [
     id: "old-tom-distillery-bourbon",
     name: "Old Tom Distillery Bourbon",
     description: "Fictional bourbon label with a full front-label layout and warning block.",
-    imagePath: "/realistic-samples/old-tom-distillery-bourbon.png",
+    imagePath: "/samples/old-tom-distillery-bourbon.png",
     expectedOverallStatus: "pass",
     expectedFailureOrReviewReason: "Clean compliant sample.",
     expectedFields: {
@@ -85,7 +85,7 @@ export const sampleCases: SampleCase[] = [
     id: "stones-throw-rye",
     name: "Stone’s Throw Rye",
     description: "Fictional rye whiskey label with common formatting variations.",
-    imagePath: "/realistic-samples/stones-throw-rye.png",
+    imagePath: "/samples/stones-throw-rye.png",
     expectedOverallStatus: "pass",
     expectedFailureOrReviewReason: "Formatting, proof, and unit differences are equivalent after normalization.",
     expectedFields: {
@@ -123,7 +123,7 @@ export const sampleCases: SampleCase[] = [
     id: "riverbend-cellars-red-wine",
     name: "Riverbend Cellars Red Wine",
     description: "Fictional red wine label with a complete reviewable label image.",
-    imagePath: "/realistic-samples/riverbend-cellars-red-wine.png",
+    imagePath: "/samples/riverbend-cellars-red-wine.png",
     expectedOverallStatus: "fail",
     expectedFailureOrReviewReason: "Alcohol content on the label does not match the expected application value.",
     expectedFields: {
@@ -159,7 +159,7 @@ export const sampleCases: SampleCase[] = [
     id: "harbor-light-ipa-can",
     name: "Harbor Light Brewing IPA",
     description: "Fictional beer can label with a full text panel.",
-    imagePath: "/realistic-samples/harbor-light-ipa-can.png",
+    imagePath: "/samples/harbor-light-ipa-can.png",
     expectedOverallStatus: "fail",
     expectedFailureOrReviewReason: "Warning heading capitalization does not match the required all-caps heading.",
     expectedFields: {
@@ -195,7 +195,7 @@ export const sampleCases: SampleCase[] = [
     id: "copper-ridge-vodka-label",
     name: "Copper Ridge Vodka",
     description: "Fictional vodka label with a clean product panel.",
-    imagePath: "/realistic-samples/copper-ridge-vodka-label.png",
+    imagePath: "/samples/copper-ridge-vodka-label.png",
     expectedOverallStatus: "fail",
     expectedFailureOrReviewReason: "No government warning was detected.",
     expectedFields: {
@@ -242,7 +242,7 @@ export const sampleCases: SampleCase[] = [
     id: "mesa-verde-mezcal-glare",
     name: "Mesa Verde Mezcal",
     description: "Fictional mezcal label photographed with a realistic reflective surface.",
-    imagePath: "/realistic-samples/mesa-verde-mezcal-glare.png",
+    imagePath: "/samples/mesa-verde-mezcal-glare.png",
     expectedOverallStatus: "needs_review",
     expectedFailureOrReviewReason: "Main fields are readable, but glare/legibility makes warning verification uncertain.",
     expectedFields: {
@@ -297,7 +297,7 @@ export const sampleCases: SampleCase[] = [
     id: "north-fork-cidery-label",
     name: "North Fork Cidery",
     description: "Fictional cider label with a complete warning block.",
-    imagePath: "/realistic-samples/north-fork-cidery-label.png",
+    imagePath: "/samples/north-fork-cidery-label.png",
     expectedOverallStatus: "needs_review",
     expectedFailureOrReviewReason: "Class/type is close but not exact: expected Hard Apple Cider, found Apple Cider.",
     expectedFields: {
@@ -333,7 +333,7 @@ export const sampleCases: SampleCase[] = [
     id: "silver-pine-gin-label",
     name: "Silver Pine Gin",
     description: "Fictional gin label with proof and metric contents expressed differently.",
-    imagePath: "/realistic-samples/silver-pine-gin-label.png",
+    imagePath: "/samples/silver-pine-gin-label.png",
     expectedOverallStatus: "pass",
     expectedFailureOrReviewReason: "Proof and net contents are equivalent to expected values.",
     expectedFields: {

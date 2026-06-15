@@ -49,7 +49,7 @@ const OBSTRUCTION_TERMS = [
 ] as const;
 
 function canonicalWarningHeading(value?: string): string {
-  return normalizeWarningText(value ?? "").replace(/:$/, "");
+  return normalizeWarningText(value ?? "");
 }
 
 function confidenceNeedsReview(confidence?: number): boolean {
@@ -307,8 +307,10 @@ export function validateAlcoholContent(application: ApplicationFields, extracted
     found: extracted.alcoholContent,
     normalizedExpected: formatAbv(expectedAbv),
     normalizedFound: formatAbv(foundAbv),
-    status: "fail",
-    reason: `Alcohol content differs by ${difference.toFixed(2)} percentage points ABV.`,
+    status: confidenceNeedsReview(confidence) ? "needs_review" : "fail",
+    reason: confidenceNeedsReview(confidence)
+      ? `Alcohol content differs by ${difference.toFixed(2)} percentage points ABV, but extraction confidence is low. Route to human review before failing the field.`
+      : `Alcohol content differs by ${difference.toFixed(2)} percentage points ABV.`,
     confidence,
   };
 }
@@ -375,8 +377,10 @@ export function validateNetContents(application: ApplicationFields, extracted: E
     found: extracted.netContents,
     normalizedExpected: formatMl(expectedMl),
     normalizedFound: formatMl(foundMl),
-    status: "fail",
-    reason: `Net contents differ by ${difference.toFixed(0)} mL.`,
+    status: confidenceNeedsReview(confidence) ? "needs_review" : "fail",
+    reason: confidenceNeedsReview(confidence)
+      ? `Net contents differ by ${difference.toFixed(0)} mL, but extraction confidence is low. Route to human review before failing the field.`
+      : `Net contents differ by ${difference.toFixed(0)} mL.`,
     confidence,
   };
 }
@@ -386,8 +390,7 @@ function warningTextWithHeading(extracted: ExtractedLabel): string | undefined {
   const text = extracted.governmentWarningText ?? "";
   if (normalizeWarningText(text).toUpperCase().startsWith(GOVERNMENT_WARNING_HEADING)) return text;
   const heading = normalizeWarningText(extracted.governmentWarningHeading ?? "");
-  const headingWithColon = heading.endsWith(":") ? heading : `${heading}:`;
-  return `${headingWithColon} ${text}`.trim();
+  return `${heading} ${text}`.trim();
 }
 
 export function validateGovernmentWarning(extracted: ExtractedLabel): CheckResult {
@@ -419,7 +422,7 @@ export function validateGovernmentWarning(extracted: ExtractedLabel): CheckResul
     };
   }
 
-  if (canonicalWarningHeading(extracted.governmentWarningHeading) !== GOVERNMENT_WARNING_HEADING) {
+  if (canonicalWarningHeading(extracted.governmentWarningHeading) !== `${GOVERNMENT_WARNING_HEADING}:`) {
     failures.push('Heading must be exactly "GOVERNMENT WARNING:" in all caps.');
   }
 

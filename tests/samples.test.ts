@@ -20,7 +20,7 @@ describe("realistic sample label library", () => {
     for (const sample of sampleCases) {
       expect(stagedLabels).not.toContain(sample.name);
       expect(sample.name).not.toMatch(/mismatch|fail|missing|low confidence|needs review/i);
-      expect(sample.imagePath).toMatch(/^\/realistic-samples\/.+\.png$/);
+      expect(sample.imagePath).toMatch(/^\/samples\/.+\.png$/);
       expect(existsSync(join(process.cwd(), "public", sample.imagePath))).toBe(true);
       expect(sample.expectedFields.brandName).toBeTruthy();
       expect(sample.expectedFields.alcoholContent).toBeTruthy();

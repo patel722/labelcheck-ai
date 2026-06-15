@@ -16,6 +16,19 @@ const validPngBytes = Uint8Array.from(
   Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=", "base64"),
 );
 
+function fakeJpeg(width = 1, height = 1): Buffer {
+  return Buffer.from([
+    0xff, 0xd8,
+    0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46, 0x49, 0x46, 0x00, 0x01, 0x01, 0x01, 0x00, 0x48, 0x00, 0x48, 0x00, 0x00,
+    0xff, 0xc0, 0x00, 0x11, 0x08, height >> 8, height & 0xff, width >> 8, width & 0xff, 0x03, 0x01, 0x11, 0x00, 0x02, 0x11, 0x00, 0x03, 0x11, 0x00,
+    0xff, 0xd9,
+  ]);
+}
+
+function filePart(buffer: Buffer): ArrayBuffer {
+  return buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength) as ArrayBuffer;
+}
+
 function formData(fields: Record<string, string>, file?: File): FormData {
   const form = new FormData();
   for (const [key, value] of Object.entries(fields)) {
@@ -129,6 +142,45 @@ describe("review API route", () => {
     expect(result.body.error).toContain("validated as PNG");
   });
 
+  it.each([
+    {
+      name: "zero-byte image",
+      file: new File([], "empty.png", { type: "image/png" }),
+      error: "Image is empty",
+    },
+    {
+      name: "malformed image",
+      file: new File([filePart(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]))], "malformed.png", {
+        type: "image/png",
+      }),
+      error: "Image dimensions",
+    },
+    {
+      name: "oversized image",
+      file: new File([filePart(Buffer.concat([Buffer.from(validPngBytes), Buffer.alloc(8 * 1024 * 1024)]))], "large.png", {
+        type: "image/png",
+      }),
+      error: "too large",
+    },
+    {
+      name: "excessive dimensions",
+      file: new File([filePart(fakeJpeg(6000, 6000))], "huge.jpg", { type: "image/jpeg" }),
+      error: "25 megapixels",
+    },
+  ])("rejects $name before provider forwarding", async ({ file, error }) => {
+    vi.stubEnv("OPENAI_API_KEY", "test-key");
+    const providerFetch = vi.fn();
+    vi.stubGlobal("fetch", providerFetch);
+
+    const result = await postReview(formData(requiredFields, file));
+    vi.unstubAllGlobals();
+    vi.unstubAllEnvs();
+
+    expect(result.status).toBe(400);
+    expect(result.body.error).toContain(error);
+    expect(providerFetch).not.toHaveBeenCalled();
+  });
+
   it("uses the sample fixture when both sampleId and file are provided", async () => {
     const result = await postReview(
       formData(
@@ -169,7 +221,7 @@ describe("review API route", () => {
               classType: "Kentucky Straight Bourbon Whiskey",
               alcoholContent: "90 Proof",
               netContents: "750 mL",
-              governmentWarningHeading: "GOVERNMENT WARNING",
+              governmentWarningHeading: "GOVERNMENT WARNING:",
               governmentWarningText:
                 "(1) According to the Surgeon General, women should not drink alcoholic beverages during pregnancy because of the risk of birth defects. (2) Consumption of alcoholic beverages impairs your ability to drive a car or operate machinery, and may cause health problems.",
               governmentWarningHeadingAppearsBold: true,

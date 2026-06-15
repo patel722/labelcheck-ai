@@ -7,6 +7,10 @@ npm run lint
 npm run typecheck
 npm test
 npm run build
+npm run cf:build
+npm run cf:check
+npm audit --omit=dev
+npm audit
 ```
 
 ## Validator Coverage
@@ -51,3 +55,9 @@ Each sample in `lib/samples.ts` is tested by running deterministic validators ag
 5. Switch to Batch mode, click `Add sample batch`, then run `Review Ready Queue`.
 6. Export JSON and CSV reports and confirm sample metadata is included in JSON exports.
 7. Upload a custom image with no `OPENAI_API_KEY` and confirm the app fails gracefully to `Needs Review`.
+
+## Deployment Readiness
+
+- `npm run cf:build` verifies the OpenNext Cloudflare bundle can be generated.
+- `npm run cf:check` verifies Wrangler can perform a deployment dry run without publishing.
+- `npm audit --omit=dev` and `npm audit` document dependency risk before submission.

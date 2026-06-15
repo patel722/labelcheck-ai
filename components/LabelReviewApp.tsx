@@ -83,6 +83,12 @@ function statusIcon(status: ReviewStatus) {
   return <AlertTriangle aria-hidden="true" />;
 }
 
+function modeLabel(mode?: ReviewResult["mode"]): string {
+  if (mode === "ai") return "AI mode";
+  if (mode === "demo") return "Demo mode";
+  return "Human review fallback";
+}
+
 function formatConfidence(confidence?: number): string {
   if (typeof confidence !== "number") return "Not provided";
   return `${Math.round(confidence * 100)}%`;
@@ -179,7 +185,6 @@ function resultExportPayload(
     provider: result.provider ?? result.mode,
     imagePreparation,
     imageQuality: result.extracted.imageQuality ?? [],
-    demoScenario: sample?.expectedFailureOrReviewReason,
     notes: result.warnings ?? result.extracted.notes ?? [],
     limitations: [
       "Prototype recommendation only.",
@@ -757,6 +762,7 @@ export function LabelReviewApp() {
             onExportCsv={exportSelectedCsv}
             imagePreparation={singlePrepared?.summary}
             sample={selectedSample}
+            expectedFields={activeFields}
           />
         </form>
       ) : (
@@ -858,6 +864,7 @@ export function LabelReviewApp() {
                   onExportCsv={exportSelectedCsv}
                   imagePreparation={selectedJob.imagePreparation}
                   sample={selectedJobSample}
+                  expectedFields={selectedJob.expectedFields}
                   embedded
                 />
               </>
@@ -1007,6 +1014,7 @@ function ResultPanel({
   onExportCsv,
   imagePreparation,
   sample,
+  expectedFields,
   embedded = false,
 }: {
   result: ApiReviewResult | null;
@@ -1018,6 +1026,7 @@ function ResultPanel({
   onExportCsv: () => void;
   imagePreparation?: ImagePreparationSummary;
   sample?: SampleCase;
+  expectedFields: ApplicationFields;
   embedded?: boolean;
 }) {
   return (
@@ -1030,7 +1039,7 @@ function ResultPanel({
           </div>
           {result ? (
             <div className={`mode-pill mode-${mode}`}>
-              {mode === "ai" ? "AI mode" : mode === "demo" ? "Demo mode" : "Human review fallback"}
+              {modeLabel(mode)}
             </div>
           ) : null}
         </div>
@@ -1060,6 +1069,10 @@ function ResultPanel({
               <div>
                 <dt>Provider</dt>
                 <dd>{result.provider ?? result.mode}</dd>
+              </div>
+              <div>
+                <dt>Mode</dt>
+                <dd>{modeLabel(result.mode)}</dd>
               </div>
             </dl>
           </div>
@@ -1139,12 +1152,12 @@ function ResultPanel({
               {sample ? (
                 <section>
                   <h3>Sample context</h3>
-                  <pre>{JSON.stringify({ sampleId: sample.id, sampleName: sample.name, imagePath: sample.imagePath, intendedScenario: sample.expectedFailureOrReviewReason }, null, 2)}</pre>
+                  <pre>{JSON.stringify({ sampleId: sample.id, sampleName: sample.name, imagePath: sample.imagePath, description: sample.description }, null, 2)}</pre>
                 </section>
               ) : null}
               <section>
                 <h3>Expected fields</h3>
-                <pre>{JSON.stringify(sample?.expectedFields ?? {}, null, 2)}</pre>
+                <pre>{JSON.stringify(expectedFields, null, 2)}</pre>
               </section>
               <section>
                 <h3>Image preparation</h3>

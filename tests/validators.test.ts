@@ -25,7 +25,7 @@ function warningExtraction(overrides: Partial<ExtractedLabel> = {}): ExtractedLa
     classType: "Red Wine",
     alcoholContent: "90 Proof",
     netContents: "0.75 L",
-    governmentWarningHeading: GOVERNMENT_WARNING_HEADING,
+    governmentWarningHeading: `${GOVERNMENT_WARNING_HEADING}:`,
     governmentWarningText: GOVERNMENT_WARNING_BODY,
     governmentWarningHeadingAppearsBold: true,
     warningAppearsLegible: true,
@@ -86,6 +86,14 @@ describe("deterministic validators", () => {
     expect(result.status).toBe("needs_review");
   });
 
+  it("fails clearly different class/type values", () => {
+    const result = validateClassType(
+      { ...baseApplication, classType: "Red Wine" },
+      warningExtraction({ classType: "Vodka" }),
+    );
+    expect(result.status).toBe("fail");
+  });
+
   it("passes 750 ML vs 750 mL", () => {
     const result = validateNetContents(baseApplication, warningExtraction({ netContents: "750 ML" }));
     expect(result.status).toBe("pass");
@@ -125,6 +133,17 @@ describe("deterministic validators", () => {
     expect(result.status).toBe("fail");
   });
 
+  it("routes low-confidence alcohol mismatches to review instead of failing automatically", () => {
+    const result = validateAlcoholContent(
+      { ...baseApplication, alcoholContent: "13.5% Alc./Vol." },
+      warningExtraction({
+        alcoholContent: "12.0% Alc./Vol.",
+        fieldConfidences: { alcoholContent: 0.4 },
+      }),
+    );
+    expect(result.status).toBe("needs_review");
+  });
+
   it("passes alcohol content at the tolerance boundary", () => {
     const result = validateAlcoholContent(baseApplication, warningExtraction({ alcoholContent: "45.25% ABV" }));
     expect(result.status).toBe("pass");
@@ -143,6 +162,17 @@ describe("deterministic validators", () => {
       baseApplication,
       warningExtraction({
         netContents: "750 mL",
+        fieldConfidences: { netContents: 0.4 },
+      }),
+    );
+    expect(result.status).toBe("needs_review");
+  });
+
+  it("routes low-confidence net content mismatches to review instead of failing automatically", () => {
+    const result = validateNetContents(
+      { ...baseApplication, netContents: "750 mL" },
+      warningExtraction({
+        netContents: "1 L",
         fieldConfidences: { netContents: 0.4 },
       }),
     );
@@ -172,6 +202,16 @@ describe("deterministic validators", () => {
     );
     expect(result.status).toBe("fail");
     expect(result.reason).toContain("GOVERNMENT WARNING");
+  });
+
+  it("fails all-caps government warning heading when the colon is missing", () => {
+    const result = validateGovernmentWarning(
+      warningExtraction({
+        governmentWarningHeading: "GOVERNMENT WARNING",
+      }),
+    );
+    expect(result.status).toBe("fail");
+    expect(result.reason).toContain('Heading must be exactly "GOVERNMENT WARNING:"');
   });
 
   it("fails altered government warning body", () => {
@@ -322,7 +362,26 @@ describe("deterministic validators", () => {
       "Government Warning",
     ]);
     for (const check of result.checks) {
+      expect(check.expected, `${sample.id} ${check.field} expected`).toBeTruthy();
+      expect(["pass", "needs_review", "fail"]).toContain(check.status);
       expect(check.reason.length).toBeGreaterThan(10);
+      expect(typeof check.confidence, `${sample.id} ${check.field} confidence`).toBe("number");
+
+      if (!(sample.id === "copper-ridge-vodka-label" && check.field === "Government Warning")) {
+        expect(check.found, `${sample.id} ${check.field} found`).toBeTruthy();
+      }
+    }
+
+    const expectedFieldStatuses: Partial<Record<string, Record<string, string>>> = {
+      "riverbend-cellars-red-wine": { "Alcohol Content": "fail" },
+      "harbor-light-ipa-can": { "Government Warning": "fail" },
+      "copper-ridge-vodka-label": { "Government Warning": "fail" },
+      "mesa-verde-mezcal-glare": { "Government Warning": "needs_review" },
+      "north-fork-cidery-label": { "Class/Type": "needs_review" },
+    };
+
+    for (const [field, status] of Object.entries(expectedFieldStatuses[sample.id] ?? {})) {
+      expect(result.checks.find((check) => check.field === field)?.status, `${sample.id} ${field}`).toBe(status);
     }
   });
 });
