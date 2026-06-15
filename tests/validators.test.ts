@@ -218,6 +218,45 @@ describe("deterministic validators", () => {
     expect(result.reason).toContain("Image quality may affect this field");
   });
 
+  it("routes warning extraction to review when evidence mentions glare even without imageQuality flags", () => {
+    const result = validateGovernmentWarning(
+      warningExtraction({
+        imageQuality: [],
+        extractionEvidence: {
+          governmentWarning: {
+            value: "GOVERNMENT WARNING: (1) ... (2) ...",
+            confidence: 0.95,
+            evidenceText: "GOVERNMENT WARNING: (1) ... (2) ...",
+            visualEvidence: "Warning block visible with slight glare/reflection on right side but text readable.",
+            source: "text",
+          },
+        },
+      }),
+    );
+
+    expect(result.status).toBe("needs_review");
+    expect(result.reason).toContain("Extraction evidence mentions possible warning-block image obstruction");
+  });
+
+  it("does not route warning extraction to review for explicitly negated glare evidence", () => {
+    const result = validateGovernmentWarning(
+      warningExtraction({
+        imageQuality: [],
+        extractionEvidence: {
+          governmentWarning: {
+            value: "GOVERNMENT WARNING: (1) ... (2) ...",
+            confidence: 0.95,
+            evidenceText: "GOVERNMENT WARNING: (1) ... (2) ...",
+            visualEvidence: "Warning block visible with no glare or obstruction.",
+            source: "text",
+          },
+        },
+      }),
+    );
+
+    expect(result.status).toBe("pass");
+  });
+
   it("passes exact government warning text", () => {
     const result = validateGovernmentWarning(warningExtraction());
     expect(result.status).toBe("pass");

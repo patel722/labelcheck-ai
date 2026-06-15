@@ -18,6 +18,7 @@ The runtime prompt used by the OpenAI adapter lives in `lib/aiExtractionGuidelin
 - Report extraction evidence for each reviewed field: the copied value, a 0-1 confidence score for that value, a short visible-text quote or visual note, and a source label.
 - Keep extraction evidence short. It is a traceability aid for reviewers, not a full OCR transcript.
 - Report image quality flags only when glare, blur, angle, crop, low resolution, or occlusion materially affects extraction.
+- If extraction evidence mentions glare, reflection, blur, crop, angle, low resolution, occlusion, fold, tear, overprint, label curvature, or obstruction for a field, the response should also include a matching image-quality flag and lowered field confidence.
 
 ## Self-Checks
 
@@ -33,7 +34,7 @@ Before returning JSON, the model is instructed to confirm:
 
 Extraction evidence is displayed beside each field-level result and included in JSON exports. It helps a reviewer understand what the model used when extracting a value. It does not override the validators: deterministic checks still compare the extracted values against the expected application fields, and low-confidence or ambiguous extractions route to human review.
 
-For government-warning checks, a material image-quality flag on the warning block is treated as a human-review signal even when the model extracted matching text. This prevents the app from overstating certainty when the image itself is visually compromised.
+For government-warning checks, a material image-quality flag on the warning block is treated as a human-review signal even when the model extracted matching text. As a defensive backstop, warning evidence that mentions glare, reflection, or another obstruction also routes to human review even if the model omitted the image-quality flag. This prevents the app from overstating certainty when the image itself is visually compromised.
 
 ## Fallback Behavior
 

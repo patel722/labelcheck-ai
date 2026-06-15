@@ -23,6 +23,30 @@ import {
 
 const LOW_CONFIDENCE_THRESHOLD = 0.6;
 const CLOSE_MATCH_THRESHOLD = 0.82;
+const OBSTRUCTION_TERMS = [
+  "glare",
+  "reflection",
+  "reflective",
+  "blur",
+  "blurry",
+  "crop",
+  "cropped",
+  "angle",
+  "low resolution",
+  "occlusion",
+  "occluded",
+  "blocked",
+  "obstruction",
+  "obstructed",
+  "fold",
+  "folded",
+  "tear",
+  "torn",
+  "overprint",
+  "overprinting",
+  "curvature",
+  "curved",
+] as const;
 
 function canonicalWarningHeading(value?: string): string {
   return normalizeWarningText(value ?? "").replace(/:$/, "");
@@ -40,6 +64,29 @@ function imageQualityReason(
   if (!flags.length) return undefined;
   const summary = flags.map((flag) => `${flag.type.replaceAll("_", " ")} (${flag.severity})`).join(", ");
   return `Image quality may affect this field: ${summary}. Route to human review before making a final call.`;
+}
+
+function containsUnnegatedTerm(value: string, term: string): boolean {
+  const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const termPattern = new RegExp(`\\b${escaped}\\b`, "i");
+  const negatedPattern = new RegExp(
+    `\\b(?:no|without|not)\\b[\\w\\s,/-]{0,40}\\b${escaped}\\b`,
+    "i",
+  );
+  return termPattern.test(value) && !negatedPattern.test(value);
+}
+
+function evidenceObstructionReason(extracted: ExtractedLabel, affectedField: ImageQualityAffectedField): string | undefined {
+  if (affectedField !== "government_warning") return undefined;
+
+  const evidence = extracted.extractionEvidence?.governmentWarning;
+  const combined = [evidence?.evidenceText, evidence?.visualEvidence].filter(Boolean).join(" ");
+  if (!combined) return undefined;
+
+  const matchedTerms = OBSTRUCTION_TERMS.filter((term) => containsUnnegatedTerm(combined, term));
+  if (!matchedTerms.length) return undefined;
+
+  return `Extraction evidence mentions possible warning-block image obstruction (${matchedTerms.join(", ")}). Route to human review before making a final call.`;
 }
 
 function textCheck(options: {
@@ -349,6 +396,7 @@ export function validateGovernmentWarning(extracted: ExtractedLabel): CheckResul
   const normalizedExpected = normalizeWarningText(GOVERNMENT_WARNING_TEXT);
   const normalizedFound = found ? normalizeWarningText(found) : undefined;
   const qualityReason = imageQualityReason(extracted, "government_warning");
+  const evidenceQualityReason = evidenceObstructionReason(extracted, "government_warning");
   const failures: string[] = [];
   const reviewItems: string[] = [];
 
@@ -356,7 +404,7 @@ export function validateGovernmentWarning(extracted: ExtractedLabel): CheckResul
     const lowConfidenceReason = confidenceNeedsReview(confidence)
       ? "Government warning extraction confidence is low."
       : undefined;
-    const reviewReason = qualityReason ?? lowConfidenceReason;
+    const reviewReason = qualityReason ?? evidenceQualityReason ?? lowConfidenceReason;
     return {
       field: "Government Warning",
       expected: GOVERNMENT_WARNING_TEXT,
@@ -397,6 +445,10 @@ export function validateGovernmentWarning(extracted: ExtractedLabel): CheckResul
 
   if (qualityReason) {
     reviewItems.push(qualityReason);
+  }
+
+  if (evidenceQualityReason) {
+    reviewItems.push(evidenceQualityReason);
   }
 
   const status: ReviewStatus = failures.length ? "fail" : reviewItems.length ? "needs_review" : "pass";

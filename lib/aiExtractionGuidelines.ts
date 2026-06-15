@@ -38,6 +38,7 @@ Extract visible alcohol label information using these rules:
 - Evidence confidence should align with fieldConfidences for the same field unless the field is absent and the evidence describes non-visibility.
 - Add imageQuality flags only when image defects materially affect one or more fields.
 - When an imageQuality flag affects a reviewed field, mention the affected field and the reason in extractionEvidence.visualEvidence.
+- If extractionEvidence.visualEvidence mentions glare, reflection, blur, crop, angle, low resolution, occlusion, fold, tear, overprint, label curvature, or obstruction for a field, also add a matching imageQuality flag and lower that field's confidence.
 
 Self-check before returning JSON:
 - Every schema key is present.

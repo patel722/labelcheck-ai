@@ -16,6 +16,7 @@ describe("AI extraction guidelines", () => {
     expect(combined).toContain("extractionEvidence");
     expect(combined).toContain("Use confidence below 0.60");
     expect(combined).toContain("glare, reflection, blur, crop, angle, low resolution, occlusion");
+    expect(combined).toContain("also add a matching imageQuality flag");
     expect(combined).toContain("Evidence values and field values do not conflict");
     expect(combined).toContain("imageQuality");
     expect(combined).toContain("no pass/fail/legal conclusion");
